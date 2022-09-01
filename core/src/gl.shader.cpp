@@ -1,22 +1,9 @@
 #include <fmt/format.h>
 
 #include <orange/gl/shader.hpp>
-#include <orange/gl/utils.hpp>
 
 namespace orange::gl
 {
-
-Shader::Shader(GLenum type, const std::string &source)
-	: Handle(invoke(glCreateShader, type), [](GLuint handle) { glDeleteShader(handle); })
-{
-	compile(reinterpret_cast<const GLchar *>(source.data()), static_cast<GLint>(source.size()));
-}
-
-Shader::Shader(GLenum type, const ByteBuffer &buffer)
-	: Handle(invoke(glCreateShader, type), [](GLuint handle) { glDeleteShader(handle); })
-{
-	compile(reinterpret_cast<const GLchar *>(buffer.data()), static_cast<GLint>(buffer.size()));
-}
 
 void Shader::compile(const GLchar *source, GLint length)
 {

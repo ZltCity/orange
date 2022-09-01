@@ -1,0 +1,32 @@
+#version 460
+
+in vec4 fragColor;
+in vec2 texCoord;
+
+layout(location = 0) out vec4 outColor;
+
+layout(binding = 0) uniform sampler2D atlas;
+layout(binding = 1) uniform usampler2D tileMap;
+
+uniform vec2 screenSize;
+uniform vec2 tileMapSize;
+uniform vec2 offset;
+uniform float scaleFactor;
+
+void main()
+{
+	const vec2 tileSize = vec2(16, 16);
+	const vec2 fragCoord = (gl_FragCoord.xy + offset) / scaleFactor;
+	const vec2 tileID = floor(fragCoord / tileSize);
+
+	if (tileID.x < 0 || tileID.y < 0 || tileID.x >= tileMapSize.x || tileID.y >= tileMapSize.y)
+	{
+		discard;
+	}
+
+	const vec2 tilePart = vec2(16, 16) - mod(fragCoord, tileSize);
+	const vec2 tileCoord = (vec2(texture(tileMap, tileID / tileMapSize).rg) * vec2(16, 16) + tilePart) / vec2(128, 128);
+
+	//		outColor = vec4(tileCoord, 0.0f, 1.0f);
+	outColor = texture(atlas, tileCoord);
+}

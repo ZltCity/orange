@@ -4,6 +4,8 @@
 #include <orange/gl/utils.hpp>
 #include <orange/renderer.hpp>
 
+#include <embedded/resources.hpp>
+
 namespace orange
 {
 
@@ -82,8 +84,8 @@ void Renderer::loadQuad()
 void Renderer::loadShaders()
 {
 	tileMapProgram = gl::Program({
-		gl::Shader(GL_VERTEX_SHADER, *assetManager->getAsset("./shaders/simple.vertex")),
-		gl::Shader(GL_FRAGMENT_SHADER, *assetManager->getAsset("./shaders/simple.fragment")),
+		gl::Shader(GL_VERTEX_SHADER, embedded::getResource(embedded::ResourceID::TILE_MAP_VERTEX)),
+		gl::Shader(GL_FRAGMENT_SHADER, embedded::getResource(embedded::ResourceID::TILE_MAP_FRAGMENT)),
 	});
 }
 
