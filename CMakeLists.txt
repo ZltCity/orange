@@ -21,4 +21,5 @@ add_subdirectory(3rdparty/wxWidgets)
 
 add_subdirectory(core)
 add_subdirectory(editor)
+add_subdirectory(embedded)
 add_subdirectory(game)

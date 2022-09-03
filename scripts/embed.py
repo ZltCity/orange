@@ -1,72 +1,91 @@
 import os
+import re
 import argparse
-
-ALLOWED_EXTENSIONS = ['vertex', 'fragment']
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--embedded-dir', required=True)
 parser.add_argument('--output-dir', required=True)
+parser.add_argument('--extensions', default='')
 
 args = parser.parse_args()
-allowed_files = []
+filtered_files = []
+
+ALLOWED_EXTENSIONS = [e.lower().strip() for e in args.extensions.split(',') if e]
+
+
+def is_allowed(ext: str) -> bool:
+    return ext in ALLOWED_EXTENSIONS or not ALLOWED_EXTENSIONS
+
 
 for root, dirs, files in os.walk(args.embedded_dir):
-    allowed_files.extend(
+    filtered_files.extend(
         [f'{root}/{f}'.replace('\\', '/')
-         for f in filter(lambda x: x.split('.')[-1].lower() in ALLOWED_EXTENSIONS, files)])
+         for f in filter(lambda x: is_allowed(x.split('.')[-1].lower()), files)])
 
 
-def read_file(path: str) -> list[str]:
-    with open(path, 'r') as f:
-        return f.readlines()
+def read_file(path: str) -> bytes:
+    return open(path, 'rb').read()
 
 
-strings = []
-enums = []
+resources = []
 
-for file in allowed_files:
-    lines = list(filter(lambda x: x, [line.strip() for line in read_file(file)]))
+for file in filtered_files:
+    resources.append((re.sub(r'[.\-]+', '_', file.split('/')[-1]).upper(), read_file(file)))
 
-    strings.append(lines)
-    enums.append(file.split('/')[-1].upper().replace('.', '_'))
+include_dir = f'{args.output_dir}/include/embedded'
+source_dir = f'{args.output_dir}/src'
 
-output_dir = f'{args.output_dir}/embedded/'
+os.makedirs(include_dir, exist_ok=True)
+os.makedirs(source_dir, exist_ok=True)
 
-os.makedirs(output_dir, exist_ok=True)
-
-with open(f'{output_dir}/resources.hpp', 'w') as header_file:
+with open(f'{include_dir}/resources.hpp', 'w') as header_file:
     header_file.write(
         '#pragma once\n\n'
-        '#include <cstdint>\n'
-        '#include <string_view>\n\n'
         'namespace orange::embedded\n'
         '{\n\n'
-        'enum class ResourceID: uint32_t\n'
+        'enum class ResourceID : uint32_t\n'
         '{\n'
     )
 
-    for i, enum in enumerate(enums):
+    for i, (enum, _) in enumerate(resources):
         header_file.write(f'\t{enum} = {i},\n')
 
     header_file.write(
         '};\n\n'
-        'constexpr std::string_view resources[] = {\n'
+        'const std::vector<unsigned char> &getResource(ResourceID id);\n\n'
+        '}\n'
     )
 
-    for file_lines in strings:
-        header_file.write('\t{\n')
+with open(f'{source_dir}/resources.cpp', 'w') as source_file:
+    source_file.write(
+        '#include <cstdint>\n'
+        '#include <vector>\n\n'
+        '#include <embedded/resources.hpp>\n\n'
+        'namespace orange::embedded\n'
+        '{\n\n'
+        'static const auto resources = {\n'
+    )
 
-        for line in file_lines:
-            header_file.write(f'\t\t"{line}\\n"\n')
+    for _, file_bytes in resources:
+        source_file.write(
+            '\tstd::vector<unsigned char> {\n'
+            '\t\t'
+        )
 
-        header_file.write('\t},\n')
+        for i, byte in enumerate(file_bytes, 1):
+            source_file.write(f'0x{int(byte):02x}, ')
 
-    header_file.write(
+            if i % 18 == 0:
+                source_file.write('\n\t\t')
+
+        source_file.write('},\n')
+
+    source_file.write(
         '};\n\n'
-        'std::string_view getResource(ResourceID id)\n'
+        'const std::vector<unsigned char> &getResource(ResourceID id)\n'
         '{\n'
-        '\treturn resources[static_cast<uint32_t>(id)];\n'
+        '\treturn *(resources.begin() + static_cast<uint32_t>(id));\n'
         '}\n\n'
         '}\n'
     )
