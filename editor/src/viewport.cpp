@@ -3,25 +3,25 @@
 #include <orange/gl/utils.hpp>
 #include <stb_image.h>
 
-#include "tilemap_view.hpp"
+#include "viewport.hpp"
 
 namespace orange
 {
 
-BEGIN_EVENT_TABLE(TileMapView, wxGLCanvas)
-EVT_SIZE(TileMapView::resized)
-EVT_PAINT(TileMapView::render)
-EVT_MOTION(TileMapView::mouseMoved)
-EVT_MOUSEWHEEL(TileMapView::mouseWheelMoved)
-EVT_LEFT_DOWN(TileMapView::mouseDown)
-EVT_LEFT_UP(TileMapView::mouseReleased)
-EVT_RIGHT_DOWN(TileMapView::rightClick)
-EVT_LEAVE_WINDOW(TileMapView::mouseLeftWindow)
-EVT_KEY_DOWN(TileMapView::keyPressed)
-EVT_KEY_UP(TileMapView::keyReleased)
+BEGIN_EVENT_TABLE(Viewport, wxGLCanvas)
+EVT_SIZE(Viewport::resized)
+EVT_PAINT(Viewport::render)
+EVT_MOTION(Viewport::mouseMoved)
+EVT_MOUSEWHEEL(Viewport::mouseWheelMoved)
+EVT_LEFT_DOWN(Viewport::mouseDown)
+EVT_LEFT_UP(Viewport::mouseReleased)
+EVT_RIGHT_DOWN(Viewport::rightClick)
+EVT_LEAVE_WINDOW(Viewport::mouseLeftWindow)
+EVT_KEY_DOWN(Viewport::keyPressed)
+EVT_KEY_UP(Viewport::keyReleased)
 END_EVENT_TABLE()
 
-TileMapView::TileMapView(wxFrame *parent)
+Viewport::Viewport(wxFrame *parent)
 	: wxGLCanvas(parent, wxID_ANY, contextAttributes), context(std::make_shared<wxGLContext>(this)), scaleFactor(10.0f)
 {
 	wxGLCanvas::SetCurrent(*context);
@@ -37,7 +37,7 @@ TileMapView::TileMapView(wxFrame *parent)
 	resetTileMap();
 }
 
-void TileMapView::resized(wxSizeEvent &evt)
+void Viewport::resized(wxSizeEvent &evt)
 {
 	const auto newSize = evt.GetSize();
 
@@ -46,7 +46,7 @@ void TileMapView::resized(wxSizeEvent &evt)
 	gl::invoke(glViewport, 0, 0, screenSize.x, screenSize.y);
 }
 
-void TileMapView::render(wxPaintEvent &evt)
+void Viewport::render(wxPaintEvent &evt)
 {
 	if (!IsShown())
 		return;
@@ -72,7 +72,7 @@ void TileMapView::render(wxPaintEvent &evt)
 	SwapBuffers();
 }
 
-void TileMapView::mouseMoved(wxMouseEvent &event)
+void Viewport::mouseMoved(wxMouseEvent &event)
 {
 	const auto mousePosition = event.GetPosition();
 
@@ -88,38 +88,38 @@ void TileMapView::mouseMoved(wxMouseEvent &event)
 	lastMousePosition = mousePosition;
 }
 
-void TileMapView::mouseWheelMoved(wxMouseEvent &event)
+void Viewport::mouseWheelMoved(wxMouseEvent &event)
 {
 	scaleFactor += static_cast<float>(event.GetWheelRotation()) * 0.005f;
 
 	wxWindow::Refresh();
 }
 
-void TileMapView::mouseDown(wxMouseEvent &event)
+void Viewport::mouseDown(wxMouseEvent &event)
 {
 }
 
-void TileMapView::mouseReleased(wxMouseEvent &event)
+void Viewport::mouseReleased(wxMouseEvent &event)
 {
 }
 
-void TileMapView::rightClick(wxMouseEvent &event)
+void Viewport::rightClick(wxMouseEvent &event)
 {
 }
 
-void TileMapView::mouseLeftWindow(wxMouseEvent &event)
+void Viewport::mouseLeftWindow(wxMouseEvent &event)
 {
 }
 
-void TileMapView::keyPressed(wxKeyEvent &event)
+void Viewport::keyPressed(wxKeyEvent &event)
 {
 }
 
-void TileMapView::keyReleased(wxKeyEvent &event)
+void Viewport::keyReleased(wxKeyEvent &event)
 {
 }
 
-void TileMapView::resetTileMap()
+void Viewport::resetTileMap()
 {
 	int tileMapWidth {}, tileMapHeight {}, tileMapBpp {};
 	const auto tileMapData = stbi_load("assets/images/test-tilemap.png", &tileMapWidth, &tileMapHeight, &tileMapBpp, 4);

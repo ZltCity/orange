@@ -1,7 +1,7 @@
 add_executable(editor
 	src/application.cpp
 	src/mainframe.cpp
-	src/tilemap_view.cpp)
+	src/viewport.cpp)
 
 set_target_properties(editor PROPERTIES
 	CXX_STANDARD 23

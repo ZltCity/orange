@@ -4,7 +4,7 @@ add_custom_command(TARGET header_generator
 	PRE_BUILD COMMAND python ${CMAKE_SOURCE_DIR}/scripts/embed.py
 	--embedded-dir ${CMAKE_SOURCE_DIR}/embedded/resources
 	--output-dir ${CMAKE_CURRENT_BINARY_DIR}
-	--extensions "vertex, fragment, png")
+	--extensions "vertex, fragment, png, svg")
 
 add_library(embedded STATIC
 	${CMAKE_CURRENT_BINARY_DIR}/src/resources.cpp)

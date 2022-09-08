@@ -10,10 +10,10 @@
 namespace orange
 {
 
-class TileMapView : public wxGLCanvas
+class Viewport : public wxGLCanvas
 {
 public:
-	TileMapView(wxFrame *parent);
+	explicit Viewport(wxFrame *parent);
 
 	void resized(wxSizeEvent &evt);
 
