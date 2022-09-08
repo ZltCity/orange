@@ -16,29 +16,6 @@ namespace orange
 
 const wxSize MainFrame::defaultIconSize = {16, 16};
 
-wxBitmap createImage(orange::embedded::ResourceID resourceID)
-{
-	const auto resource = orange::embedded::getResource(resourceID);
-
-	wxInitAllImageHandlers();
-	//	auto stream = std::fstream("C:\\Users\\Roman\\Projects\\orange\\bin\\test.png", std::ios::binary |
-	// std::ios::out);
-	//
-	//	for (auto byte : resource)
-	//	{
-	//		stream.put(byte);
-	//	}
-	//	auto width = int {}, height = int {}, channels = int {};
-	//	const auto data = stbi_load_from_memory(
-	//		reinterpret_cast<const stbi_uc *>(resource.data()), static_cast<int>(resource.size()), &width, &height,
-	//		&channels, 4);
-	auto stream = wxMemoryInputStream(resource.data(), resource.size());
-
-	return wxBitmap(stream);
-	//	return wxBitmap(reinterpret_cast<const char *>(data), width, height);
-	//		return {};
-}
-
 MainFrame::MainFrame() : wxFrame(NULL, wxID_ANY, "Orange editor")
 {
 	createMenuBar();

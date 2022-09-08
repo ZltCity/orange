@@ -3,8 +3,6 @@
 namespace orange
 {
 
-wxIMPLEMENT_APP(Editor);
-
 bool Editor::OnInit()
 {
 	(new MainFrame())->Show(true);
@@ -13,3 +11,5 @@ bool Editor::OnInit()
 }
 
 } // namespace orange
+
+wxIMPLEMENT_APP(orange::Editor);

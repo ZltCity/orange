@@ -3,6 +3,11 @@ add_executable(editor
 	src/mainframe.cpp
 	src/viewport.cpp)
 
+if (WIN32)
+	target_sources(editor PRIVATE
+		src/msw.rc)
+endif ()
+
 set_target_properties(editor PROPERTIES
 	CXX_STANDARD 23
 	CXX_STANDARD_REQUIRED ON)
