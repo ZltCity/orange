@@ -24,17 +24,6 @@ END_EVENT_TABLE()
 Viewport::Viewport(wxFrame *parent)
 	: wxGLCanvas(parent, wxID_ANY, contextAttributes), context(std::make_shared<wxGLContext>(this)), scaleFactor(10.0f)
 {
-	wxGLCanvas::SetCurrent(*context);
-
-	if (!gladLoadGL())
-	{
-		throw std::runtime_error("Could not load GLAD.");
-	}
-
-	assetManager = std::make_shared<orange::AssetManager>("./assets");
-	renderer = std::make_shared<orange::Renderer>(assetManager);
-
-	resetTileMap();
 }
 
 void Viewport::resized(wxSizeEvent &evt)
@@ -42,19 +31,19 @@ void Viewport::resized(wxSizeEvent &evt)
 	const auto newSize = evt.GetSize();
 
 	screenSize = glm::ivec2 {newSize.GetWidth(), newSize.GetHeight()};
-
-	gl::invoke(glViewport, 0, 0, screenSize.x, screenSize.y);
 }
 
 void Viewport::render(wxPaintEvent &evt)
 {
-	if (!IsShown())
-		return;
-
 	wxGLCanvas::SetCurrent(*context);
-	wxPaintDC(this);
 
-	gl::invoke(glClearColor, 0.5f, 0.6f, 0.5f, 1.0f);
+	if (renderer == nullptr)
+	{
+		initRenderer();
+	}
+
+	gl::invoke(glViewport, 0, 0, ToPhys(screenSize.x), ToPhys(screenSize.y));
+	gl::invoke(glClearColor, 0.0f, 0.0f, 0.0f, 1.0f);
 	gl::invoke(glClear, GL_COLOR_BUFFER_BIT);
 
 	try
@@ -117,6 +106,19 @@ void Viewport::keyPressed(wxKeyEvent &event)
 
 void Viewport::keyReleased(wxKeyEvent &event)
 {
+}
+
+void Viewport::initRenderer()
+{
+	if (!gladLoadGL())
+	{
+		throw std::runtime_error("Could not load GLAD.");
+	}
+
+	assetManager = std::make_shared<orange::AssetManager>("./assets");
+	renderer = std::make_shared<orange::Renderer>(assetManager);
+
+	resetTileMap();
 }
 
 void Viewport::resetTileMap()

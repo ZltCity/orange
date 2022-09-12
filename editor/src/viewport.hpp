@@ -33,6 +33,7 @@ public:
 private:
 	constexpr static int contextAttributes[] = {WX_GL_CORE_PROFILE, WX_GL_MAJOR_VERSION, 4, WX_GL_MINOR_VERSION, 6};
 
+	void initRenderer();
 	void resetTileMap();
 
 	std::shared_ptr<wxGLContext> context;
