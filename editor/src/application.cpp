@@ -1,3 +1,7 @@
+#include <iostream>
+
+#include <fmt/format.h>
+
 #include "application.hpp"
 
 namespace orange
@@ -5,9 +9,20 @@ namespace orange
 
 bool Editor::OnInit()
 {
-	(new MainFrame())->Show(true);
+	try
+	{
+		wxApp::OnInit();
 
-	return true;
+		(new MainFrame())->Show(true);
+
+		return true;
+	}
+	catch (const std::exception &ex)
+	{
+		std::cout << fmt::format("Some shit happened:\n\t{}.\nShutting down..", ex.what()) << std::endl;
+
+		return false;
+	}
 }
 
 } // namespace orange
